@@ -1,0 +1,4 @@
+=== RUN   TestInsertToDB
+--- PASS: TestInsertToDB (0.24s)
+PASS
+ok  	radarbase/pkg/mdb	1.219s
