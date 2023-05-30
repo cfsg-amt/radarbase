@@ -1,12 +1,13 @@
-package excel
+package excel_test
 
 import (
 	"testing"
 	"reflect"
+  "radarbase/pkg/excel"
 )
 
 func TestParse(t *testing.T) {
-	data, err := Parse("testdata/sample.xlsx", "Sheet1")
+	data, err := excel.Parse("testdata/sample.xlsx", "Sheet1")
 	if err != nil {
 		t.Errorf("Parse failed with error: %v", err)
 	}
@@ -21,7 +22,15 @@ func TestParse(t *testing.T) {
 	
 	// Print the parsed data for visual inspection
 	// This is not generally part of testing but can help verify that the parsing is done correctly
-	for _, item := range data {
+	for i, item := range data {
     t.Logf("Parsed data: %+v", item)
+    if record, ok := item["股票"]; ok {
+      t.Logf("股票 of %dth record: %v", i, record)
+    }
+    if record, ok := item["stockid"]; ok {
+      t.Logf("stockid of %dth record: %v", i, record)
+    } else {
+      t.Logf("股票 field not found in the %dth record", i)
+    }
 	}
 }

@@ -22,6 +22,10 @@ func Parse(file string, sheet string) ([]map[string]interface{}, error) {
 
 	headers := rows[0]
 
+	if len(headers) == 0 {
+		return nil, fmt.Errorf("no headers found")
+	}
+
 	for _, row := range rows[1:] {
 
 		// We'll try to parse each row, but if we encounter an error, we'll skip it
@@ -52,8 +56,13 @@ func Parse(file string, sheet string) ([]map[string]interface{}, error) {
 				}
 			}
 
+			// Use the value of the first column, remove spaces and add a "stockid" column.
+			if len(row) > 0 {
+				record["stockid"] = strings.ReplaceAll(row[0], " ", "")
+			}
+
 			// Append the validity flag to the record
-			record["Valid"] = valid
+			record["valid"] = valid
 			data = append(data, record)
 		}()
 	}
