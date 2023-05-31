@@ -29,7 +29,7 @@ func TestMain(m *testing.M) {
 		os.Exit(1)
 	}
 
-	data, err := excel.Parse("testdata/sample.xlsx", "Sheet1")
+	data, headers, err := excel.Parse("testdata/sample.xlsx", "Sheet1")
 	if err != nil {
 		os.Exit(1)
 	}
@@ -37,11 +37,8 @@ func TestMain(m *testing.M) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	for _, item := range data {
-		if err = db.InsertOne(ctx, "test", item); err != nil {
-			os.Exit(1)
-		}
-	}
+  // Inserting the test data and headers into database
+  db.LoadToDB(data, headers, "test")
 
 	defer db.Disconnect(context.Background())
 
@@ -107,4 +104,20 @@ func TestAPI_2(t *testing.T) {
   }
 
   fmt.Printf("%s", stock)
+}
+
+func TestAPI_3(t *testing.T) {
+  // Test GetStockHeadersHandler
+  res, err := http.Get(fmt.Sprintf("%s/api/v1/headers/test", ts.URL))
+  if err != nil {
+      t.Fatal(err)
+  }
+
+  headers, err := ioutil.ReadAll(res.Body)
+  res.Body.Close()
+  if err != nil {
+      t.Fatal(err)
+  }
+
+  fmt.Printf("Headers: %s", headers)
 }

@@ -35,3 +35,16 @@ func TestGetAllHeadersForStock(t *testing.T) {
 		fmt.Println(string(prettyData))
 	}
 }
+
+func TestGetStockHeaders(t *testing.T) {
+	headers, err := db.GetStockHeaders("test")
+	if err != nil {
+		t.Fatalf("failed to get headers: %v", err)
+	}
+
+	if len(headers) == 0 {
+		t.Error("No headers returned from handler")
+	} else {
+		fmt.Println(headers)
+	}
+}

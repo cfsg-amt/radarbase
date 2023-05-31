@@ -7,23 +7,23 @@ import (
   "github.com/xuri/excelize/v2"
 )
 
-func Parse(file string, sheet string) ([]map[string]interface{}, error) {
+func Parse(file string, sheet string) ([]map[string]interface{}, []string, error) {
 	var data []map[string]interface{}
 
 	xlFile, err := excelize.OpenFile(file)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	rows, err := xlFile.GetRows(sheet)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	headers := rows[0]
 
 	if len(headers) == 0 {
-		return nil, fmt.Errorf("no headers found")
+		return nil, nil, fmt.Errorf("no headers found")
 	}
 
 	for _, row := range rows[1:] {
@@ -67,5 +67,5 @@ func Parse(file string, sheet string) ([]map[string]interface{}, error) {
 		}()
 	}
 
-	return data, nil
+	return data, headers, nil
 }

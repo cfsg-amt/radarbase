@@ -9,6 +9,7 @@ func NewRouter(h *Handler) *mux.Router {
 
 	r.HandleFunc("/api/v1/{collectionName}/stocks", h.GetStocksHandler).Methods("GET")
 	r.HandleFunc("/api/v1/{collectionName}/stocks/{stockID}", h.GetStockByIDHandler).Methods("GET")
+  r.HandleFunc("/api/v1/headers/{collectionName}", h.GetHeadersHandler).Methods("GET")
 
 	return r
 }

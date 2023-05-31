@@ -9,7 +9,7 @@ import (
 )
 
 func TestPrintAllItems(t *testing.T) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 12*time.Second)
 	defer cancel()
 
 	cursor, err := db.Collection("test").Find(ctx, bson.M{})

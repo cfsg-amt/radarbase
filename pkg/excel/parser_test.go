@@ -3,11 +3,12 @@ package excel_test
 import (
 	"testing"
 	"reflect"
+  "fmt"
   "radarbase/pkg/excel"
 )
 
 func TestParse(t *testing.T) {
-	data, err := excel.Parse("testdata/sample.xlsx", "Sheet1")
+	data, headers, err := excel.Parse("testdata/sample.xlsx", "Sheet1")
 	if err != nil {
 		t.Errorf("Parse failed with error: %v", err)
 	}
@@ -19,6 +20,8 @@ func TestParse(t *testing.T) {
 	if reflect.TypeOf(data).String() != "[]map[string]interface {}" {
 		t.Errorf("Parse did not return the expected type of []map[string]interface{}")
 	}
+
+  fmt.Printf("headers: %v\n", headers)
 	
 	// Print the parsed data for visual inspection
 	// This is not generally part of testing but can help verify that the parsing is done correctly

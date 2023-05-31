@@ -3,6 +3,7 @@ package mdb
 import (
 	"context"
 	"fmt"
+  "time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -43,4 +44,25 @@ func (db *Database) GetAllHeadersForStock(stockID string, collectionName string)
 	}
 
 	return stock, nil
+}
+
+// GetStockHeaders retrieves all headers from a particular collection
+func (db *Database) GetStockHeaders(collectionName string) ([]string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	// Get collection for headers
+	headersCollection := db.database.Collection("headers")
+
+	// Find the headers document
+	var result struct {
+		Headers []string `bson:"headers"`
+	}
+
+	err := headersCollection.FindOne(ctx, bson.M{"_id": collectionName}).Decode(&result)
+	if err != nil {
+		return nil, err
+	}
+
+	return result.Headers, nil
 }

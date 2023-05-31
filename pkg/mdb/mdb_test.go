@@ -5,6 +5,7 @@ import (
 	"os"
 	"testing"
 	"time"
+  "fmt"
 
 	"radarbase/pkg/mdb"
 	"radarbase/pkg/excel"
@@ -19,7 +20,9 @@ func TestMain(m *testing.M) {
 		os.Exit(1)
 	}
 
-	data, err := excel.Parse("testdata/sample.xlsx", "Sheet1")
+	data, headers, err := excel.Parse("testdata/sample.xlsx", "Sheet1")
+  fmt.Println(headers)
+
 	if err != nil {
 		os.Exit(1)
 	}
@@ -27,11 +30,8 @@ func TestMain(m *testing.M) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	for _, item := range data {
-		if err = db.InsertOne(ctx, "test", item); err != nil {
-			os.Exit(1)
-		}
-	}
+  // Inserting the test data
+  db.LoadToDB(data, headers, "test")
 
 	// Running all the tests
 	code := m.Run()

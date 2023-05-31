@@ -57,3 +57,21 @@ func (h *Handler) GetStockByIDHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(stock)
 }
+
+// GetHeadersHandler returns all headers from a particular collection
+func (h *Handler) GetHeadersHandler(w http.ResponseWriter, r *http.Request) {
+	// extract the collection name from the URL path variable
+	vars := mux.Vars(r)
+	collectionName := vars["collectionName"]
+
+	// fetch headers from the database
+	headers, err := h.DB.GetStockHeaders(collectionName)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Write headers as JSON to response
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(headers)
+}
