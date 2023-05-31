@@ -9,14 +9,14 @@ import (
 )
 
 // GetAllStocksWithSelectedHeaders returns all the stocks with only the selected headers
-func (db *Database) GetAllStocksWithSelectedHeaders(headers []string) ([]bson.M, error) {
+func (db *Database) GetAllStocksWithSelectedHeaders(headers []string, collectionName string) ([]bson.M, error) {
 	projection := bson.M{}
 	for _, header := range headers {
 		projection[header] = 1
 	}
 	opts := options.Find().SetProjection(projection)
 
-	cursor, err := db.collection.Find(context.Background(), bson.M{}, opts)
+	cursor, err := db.Collection(collectionName).Find(context.Background(), bson.M{}, opts)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find stocks: %w", err)
 	}
@@ -31,8 +31,8 @@ func (db *Database) GetAllStocksWithSelectedHeaders(headers []string) ([]bson.M,
 }
 
 // GetAllHeadersForStock returns all the headers for a specific stock
-func (db *Database) GetAllHeadersForStock(stockID string) (bson.M, error) {
-	result := db.collection.FindOne(context.Background(), bson.M{"stockid": stockID})
+func (db *Database) GetAllHeadersForStock(stockID string, collectionName string) (bson.M, error) {
+	result := db.Collection(collectionName).FindOne(context.Background(), bson.M{"stockid": stockID})
 	if result.Err() != nil {
 		return nil, fmt.Errorf("failed to find stock: %w", result.Err())
 	}

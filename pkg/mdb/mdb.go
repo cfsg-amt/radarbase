@@ -11,16 +11,15 @@ import (
 type Database struct {
 	client     *mongo.Client
 	database   *mongo.Database
-	collection *mongo.Collection
 }
 
 // Collection returns the collection in the database.
-func (db *Database) Collection() *mongo.Collection {
-	return db.collection
+func (db *Database) Collection(collectionName string) *mongo.Collection {
+	return db.database.Collection(collectionName)
 }
 
 // NewDatabase creates a new instance of Database
-func NewDatabase(uri string, database string, collection string) (*Database, error) {
+func NewDatabase(uri string, database string) (*Database, error) {
 	clientOptions := options.Client().ApplyURI(uri)
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
@@ -35,12 +34,10 @@ func NewDatabase(uri string, database string, collection string) (*Database, err
 	}
 
 	db := client.Database(database)
-	coll := db.Collection(collection)
 
 	return &Database{
 		client:     client,
 		database:   db,
-		collection: coll,
 	}, nil
 }
 
@@ -61,8 +58,9 @@ func (db *Database) Ping() error {
 	return db.client.Ping(ctx, nil)
 }
 
-// InsertOne inserts a single document into MongoDB
-func (db *Database) InsertOne(ctx context.Context, document interface{}) error {
-	_, err := db.collection.InsertOne(ctx, document)
+// InsertOne inserts a single record into MongoDB
+func (db *Database) InsertOne(ctx context.Context, collectionName string, document interface{}) error {
+	collection := db.Collection(collectionName)
+	_, err := collection.InsertOne(ctx, document)
 	return err
 }

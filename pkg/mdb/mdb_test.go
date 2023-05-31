@@ -14,7 +14,7 @@ var db *mdb.Database
 
 func TestMain(m *testing.M) {
 	var err error
-	db, err = mdb.NewDatabase("mongodb://localhost:27017", "testdb", "stocks")
+	db, err = mdb.NewDatabase("mongodb://localhost:27017", "testdb")
 	if err != nil {
 		os.Exit(1)
 	}
@@ -28,7 +28,7 @@ func TestMain(m *testing.M) {
 	defer cancel()
 
 	for _, item := range data {
-		if err = db.InsertOne(ctx, item); err != nil {
+		if err = db.InsertOne(ctx, "test", item); err != nil {
 			os.Exit(1)
 		}
 	}

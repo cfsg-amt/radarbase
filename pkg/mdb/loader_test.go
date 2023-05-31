@@ -12,7 +12,7 @@ func TestPrintAllItems(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	cursor, err := db.Collection().Find(ctx, bson.M{})
+	cursor, err := db.Collection("test").Find(ctx, bson.M{})
 	if err != nil {
 		t.Fatalf("failed to find documents: %v", err)
 	}
