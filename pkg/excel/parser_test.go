@@ -7,8 +7,8 @@ import (
   "radarbase/pkg/excel"
 )
 
-func TestParse(t *testing.T) {
-	data, headers, err := excel.Parse("testdata/sample.xlsx", "Sheet1")
+func TestRowParse(t *testing.T) {
+	data, headers, err := excel.RowParse("testdata/sample.xlsx", "Sheet1")
 	if err != nil {
 		t.Errorf("Parse failed with error: %v", err)
 	}
@@ -34,6 +34,35 @@ func TestParse(t *testing.T) {
       t.Logf("stockid of %dth record: %v", i, record)
     } else {
       t.Logf("股票 field not found in the %dth record", i)
+    }
+	}
+}
+
+func TestColParse(t *testing.T) {
+	data, headers, err := excel.ColParse("testdata/sample.xlsx", "Sheet1")
+	if err != nil {
+		t.Errorf("ColParse failed with error: %v", err)
+	}
+	if len(data) == 0 {
+		t.Errorf("ColParse returned empty data")
+	}
+	
+	// check if the returned data is of type map[string][]interface{}
+	if reflect.TypeOf(data).String() != "map[string][]interface {}" {
+		t.Errorf("ColParse did not return the expected type of map[string][]interface{}")
+	}
+
+  fmt.Printf("headers: %v\n", headers)
+	
+	// Print the parsed data for visual inspection
+	// This is not generally part of testing but can help verify that the parsing is done correctly
+	for header, values := range data {
+    t.Logf("Parsed data for header %s: %+v", header, values)
+    if header == "股票" {
+      t.Logf("Values for 股票: %v", values)
+    }
+    if header == "stockid" {
+      t.Logf("Values for stockid: %v", values)
     }
 	}
 }
