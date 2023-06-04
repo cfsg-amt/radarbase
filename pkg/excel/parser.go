@@ -1,7 +1,8 @@
 package excel
-
 import (
   "fmt"
+  "crypto/sha256"
+  "encoding/hex"
 	"strconv"
   "strings"
   "github.com/xuri/excelize/v2"
@@ -27,7 +28,6 @@ func RowParse(file string, sheet string) ([]map[string]interface{}, []string, er
 	}
 
 	for _, row := range rows[1:] {
-
 		// We'll try to parse each row, but if we encounter an error, we'll skip it
 		func() {
 			defer func() {
@@ -36,14 +36,25 @@ func RowParse(file string, sheet string) ([]map[string]interface{}, []string, er
 				}
 			}()
 
-			record := make(map[string]interface{})
+			if len(row) == 0 {
+				return
+			}
+
+			// Generate SHA256 hash of the first cell of the row
+			hash := sha256.New()
+			hash.Write([]byte(row[0]))
+			hashStr := hex.EncodeToString(hash.Sum(nil))
+
+			record := map[string]interface{}{
+				"_id": hashStr, // Add the hash string to the record
+			}
+
 			valid := 1
 
 			for i, cell := range row {
-				// If cell is empty or "n/a", mark record as invalid and fill the cell as "n/a"
 				if cell == "" || strings.ToLower(cell) == "n/a" {
-					cell = "n/a"
 					valid = 0
+					cell = "0"
 				}
 
 				if i < len(headers) {
@@ -56,13 +67,8 @@ func RowParse(file string, sheet string) ([]map[string]interface{}, []string, er
 				}
 			}
 
-			// Use the value of the first column, remove spaces and add a "stockid" column.
-			if len(row) > 0 {
-				record["stockid"] = strings.ReplaceAll(row[0], " ", "")
-			}
+      record["valid"] = valid
 
-			// Append the validity flag to the record
-			record["valid"] = valid
 			data = append(data, record)
 		}()
 	}
@@ -100,11 +106,20 @@ func ColParse(file string, sheet string) (map[string][]interface{}, []string, er
 				}
 			}()
 
+			if len(row) == 0 {
+				return
+			}
+
+			// Generate SHA256 hash of the first cell of the row
+			hash := sha256.New()
+			hash.Write([]byte(row[0]))
+			hashStr := hex.EncodeToString(hash.Sum(nil))
+
 			valid := 1
 			for i, cell := range row {
 				// If cell is empty or "n/a", mark record as invalid and fill the cell as "n/a"
 				if cell == "" || strings.ToLower(cell) == "n/a" {
-					cell = "n/a"
+					cell = "0"
 					valid = 0
 				}
 
@@ -118,14 +133,12 @@ func ColParse(file string, sheet string) (map[string][]interface{}, []string, er
 				}
 			}
 
-			// Use the value of the first column, remove spaces and add to the "stockid" column.
-			if len(row) > 0 {
-				stockid := strings.ReplaceAll(row[0], " ", "")
-				colData["stockid"] = append(colData["stockid"], stockid)
-			}
-
 			// Append the validity flag to the "valid" column
 			colData["valid"] = append(colData["valid"], valid)
+			
+			// Use the value of the first column, remove spaces and add to the "_id" column.
+			colData["_id"] = append(colData["_id"], hashStr)
+			
 		}()
 	}
 
