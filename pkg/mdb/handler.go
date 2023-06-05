@@ -11,11 +11,10 @@ import (
   "go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// GetAllHeadersForStock returns all the headers for a specific stock
-func (db *MDB) GetAllHeadersForStock(stockName string, collectionName string) (bson.M, error) {
+func (db *MDB) GetSingleRecord(name string, collectionName string) (bson.M, error) {
   // Generate SHA256 hash of the stockName
   hash := sha256.New()
-  hash.Write([]byte(stockName))
+  hash.Write([]byte(name))
   hashStr := hex.EncodeToString(hash.Sum(nil))
   result := db.RowCollection(collectionName).FindOne(context.Background(), bson.M{"_id": hashStr})
 
@@ -31,8 +30,7 @@ func (db *MDB) GetAllHeadersForStock(stockName string, collectionName string) (b
 	return stock, nil
 }
 
-// GetStockHeaders retrieves all headers from a particular collection
-func (db *MDB) GetStockHeaders(collectionName string) ([]string, error) {
+func (db *MDB) GetHeaders(collectionName string) ([]string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -53,7 +51,7 @@ func (db *MDB) GetStockHeaders(collectionName string) ([]string, error) {
 }
 
 
-func (db *MDB) GetHeaders(headers []string, collectionName string) (map[string]map[string][]interface{}, error) {
+func (db *MDB) GetByHeaders(headers []string, collectionName string) (map[string]map[string][]interface{}, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -106,7 +104,7 @@ func (db *MDB) GetHeaders(headers []string, collectionName string) (map[string]m
 	}
 
 	if len(notFoundHeaders) > 0 {
-		return groupedResult, fmt.Errorf("the following headers were not found in any collections: %v", notFoundHeaders)
+		return groupedResult, fmt.Errorf("the following headers %v were not found in any collections", notFoundHeaders)
 	}
 
 	return groupedResult, nil

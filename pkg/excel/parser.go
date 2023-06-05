@@ -40,6 +40,8 @@ func RowParse(file string, sheet string) ([]map[string]interface{}, []string, er
 				return
 			}
 
+      row[0] = strings.ReplaceAll(row[0], " ", "")
+
 			// Generate SHA256 hash of the first cell of the row
 			hash := sha256.New()
 			hash.Write([]byte(row[0]))
@@ -109,6 +111,8 @@ func ColParse(file string, sheet string) (map[string][]interface{}, []string, er
 			if len(row) == 0 {
 				return
 			}
+
+      row[0] = strings.ReplaceAll(row[0], " ", "")
 
 			// Generate SHA256 hash of the first cell of the row
 			hash := sha256.New()

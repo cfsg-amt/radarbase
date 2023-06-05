@@ -11,7 +11,7 @@ func TestGetHeaders(t *testing.T) {
 	headers := []string{"基本分析分數", "技術分析分數", "保留盈餘增長标准分数", "基因分析標準分數"}
 
 	// Call the GetHeaders function
-	result, err := db.GetHeaders(headers, "test")
+	result, err := db.GetByHeaders(headers, "test")
 	if err != nil {
 		t.Fatalf("failed to get headers: %v", err)
 	}
@@ -27,8 +27,10 @@ func TestGetHeaders(t *testing.T) {
 }
 
 func TestGetAllHeadersForStock(t *testing.T) {
-	stockName := "1112 HK-H&H國際控股"
-	data, err := db.GetAllHeadersForStock(stockName, "test")
+  stockName := "1070HK-ＴＣＬ電子"
+
+	data, err := db.GetSingleRecord(stockName, "test")
+
 
 	if err != nil {
 		t.Fatalf("failed to get data: %v", err)
@@ -43,7 +45,7 @@ func TestGetAllHeadersForStock(t *testing.T) {
 }
 
 func TestGetStockHeaders(t *testing.T) {
-	headers, err := db.GetStockHeaders("test")
+	headers, err := db.GetHeaders("test")
 	if err != nil {
 		t.Fatalf("failed to get headers: %v", err)
 	}
