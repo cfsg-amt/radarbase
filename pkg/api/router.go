@@ -1,15 +1,32 @@
 package api
 
 import (
+  "encoding/json"
+  "net/http"
+
 	"github.com/gorilla/mux"
 )
 
-func NewRouter(h *Handler) *mux.Router {
-	r := mux.NewRouter()
+func (api *API) SetupRouter() *mux.Router {
+	router := mux.NewRouter()
 
-	r.HandleFunc("/api/v1/{collectionName}/stocks", h.GetStocksHandler).Methods("GET")
-	r.HandleFunc("/api/v1/{collectionName}/stocks/{stockID}", h.GetStockByIDHandler).Methods("GET")
-  r.HandleFunc("/api/v1/headers/{collectionName}", h.GetHeadersHandler).Methods("GET")
+	router.HandleFunc("/api/v1/{collectionName}/item", api.handleRequest(api.GetByHeadersHandler)).Methods("GET")
+	router.HandleFunc("/api/v1/{collectionName}/item/{stockName}", api.handleRequest(api.GetSingleRecordHandler)).Methods("GET")
+	router.HandleFunc("/api/v1/headers/{collectionName}", api.handleRequest(api.GetHeadersHandler)).Methods("GET")
 
-	return r
+	return router
+}
+
+// Middleware function to handle common logic and error handling
+func (api *API) handleRequest(handler func(w http.ResponseWriter, r *http.Request) (interface{}, error)) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		data, err := handler(w, r)
+		if err != nil {
+			api.respondWithError(w, http.StatusInternalServerError, err)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(data)
+	}
 }

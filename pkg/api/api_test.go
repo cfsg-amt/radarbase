@@ -2,14 +2,10 @@ package api_test
 
 import (
 	"context"
-  "strings"
-  "net/url"
 	"fmt"
   "time"
-	"io/ioutil"
 	"log"
 	"net/http"
-	"net/http/httptest"
 	"os"
 	"testing"
 
@@ -18,106 +14,90 @@ import (
 	"radarbase/pkg/excel"
 )
 
-var db *mdb.Database
-var ts *httptest.Server
+var db *mdb.MDB
+var ctx context.Context
+
+var srv *http.Server
 
 func TestMain(m *testing.M) {
-	// Setup function
 	var err error
-	db, err = mdb.NewDatabase("mongodb://localhost:27017", "testdb")
+	db, err = mdb.NewMDB("mongodb://localhost:27017", "testRowDB", "testColDB")
 	if err != nil {
+    fmt.Println(err)
 		os.Exit(1)
 	}
 
-	data, headers, err := excel.Parse("testdata/sample.xlsx", "Sheet1")
+	// Parse row data
+	rowData, rowHeaders, err := excel.RowParse("testdata/sample.xlsx", "Sheet1")
+  fmt.Println(rowHeaders) // TODO: remove this
+
 	if err != nil {
+    fmt.Println(err)
+		os.Exit(1)
+	}
+
+	// Parse columnar data
+	colData, colHeaders, err := excel.ColParse("testdata/sample.xlsx", "Sheet1")
+  fmt.Println(colHeaders)
+
+	if err != nil {
+    fmt.Println(err)
 		os.Exit(1)
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-  // Inserting the test data and headers into database
-  db.LoadToDB(data, headers, "test")
+  // Create test collection
+  // Inserting the test row data
+  err = db.RowLoadToDB(rowData, "test")
+  if err != nil {
+    fmt.Println(err)
+		os.Exit(1)
+	}
 
-	defer db.Disconnect(context.Background())
+	// Inserting the test columnar data
+  err = db.ColLoadToDB(colData, colHeaders, "test")
+  if err != nil {
+    fmt.Println(err)
+		os.Exit(1)
+	}
 
-	handler := &api.Handler{DB: db}
+	// Initialize API
+	api := api.NewAPI(db)
 
-  r := api.NewRouter(handler)
+	// Set up HTTP server
+	srv = &http.Server{
+		Handler: api.SetupRouter(),
+		Addr:    "127.0.0.1:8080",
+	}
 
-	ts = httptest.NewServer(r)
-	defer ts.Close()
+	go func() {
+		if err := srv.ListenAndServe(); err != http.ErrServerClosed {
+			// it's fine to panic here, as this should never happen when closing the server
+			log.Panic(err)
+		}
+	}()
 
 	// Running all the tests
 	code := m.Run()
 
-	// Dropping the test database
+	// Cleanup
+	if err := srv.Shutdown(context.Background()); err != nil {
+		log.Fatalf("Server Shutdown Failed:%+v", err)
+	}
+
+	// Dropping the test databases
 	if err := db.Drop(ctx); err != nil {
-		os.Exit(1)
+    fmt.Println(err)
+    os.Exit(1)
 	}
 
 	// Disconnecting from MongoDB
 	if err := db.Disconnect(ctx); err != nil {
+    fmt.Println(err)
 		os.Exit(1)
 	}
 
-	// Exit
 	os.Exit(code)
-}
-
-func TestAPI_1(t *testing.T) {
-  // headers
-  headers := []string{"基本分析分數", "技術分析分數", "保留盈餘增長标准分数", "基因分析標準分數"}
-
-  // Construct headers query param
-  headersParam := url.QueryEscape(strings.Join(headers, ","))
-
-  // Test GetStocksHandler
-  res, err := http.Get(fmt.Sprintf("%s/api/v1/test/stocks?headers=%s", ts.URL, headersParam))
-  if err != nil {
-      log.Fatal(err)
-  }
-
-  stocks, err := ioutil.ReadAll(res.Body)
-  res.Body.Close()
-  if err != nil {
-      log.Fatal(err)
-  }
-
-  fmt.Printf("%s\n", stocks)
-}
-
-func TestAPI_2(t *testing.T) {
-  // stockID
-  stockID := "1112HK-H&H國際控股"
-  // Test GetStockByIDHandler
-  res, err := http.Get(fmt.Sprintf("%s/api/v1/test/stocks/%s", ts.URL, url.QueryEscape(stockID)))
-  if err != nil {
-      log.Fatal(err)
-  }
-
-  stock, err := ioutil.ReadAll(res.Body)
-  res.Body.Close()
-  if err != nil {
-      log.Fatal(err)
-  }
-
-  fmt.Printf("%s", stock)
-}
-
-func TestAPI_3(t *testing.T) {
-  // Test GetStockHeadersHandler
-  res, err := http.Get(fmt.Sprintf("%s/api/v1/headers/test", ts.URL))
-  if err != nil {
-      t.Fatal(err)
-  }
-
-  headers, err := ioutil.ReadAll(res.Body)
-  res.Body.Close()
-  if err != nil {
-      t.Fatal(err)
-  }
-
-  fmt.Printf("Headers: %s", headers)
 }
