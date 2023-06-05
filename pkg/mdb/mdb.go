@@ -7,19 +7,25 @@ import (
 	"time"
 )
 
-// Database encapsulates mongo.Database
-type Database struct {
-	client     *mongo.Client
-	database   *mongo.Database
+// MDB encapsulates mongo.Databases
+type MDB struct {
+	client *mongo.Client
+	rowdb  *mongo.Database // row database
+	coldb  *mongo.Database // col database (storing columnar data)
 }
 
-// Collection returns the collection in the database.
-func (db *Database) Collection(collectionName string) *mongo.Collection {
-	return db.database.Collection(collectionName)
+// RowCollection returns the collection in the row database.
+func (mdb *MDB) RowCollection(collectionName string) *mongo.Collection {
+	return mdb.rowdb.Collection(collectionName)
 }
 
-// NewDatabase creates a new instance of Database
-func NewDatabase(uri string, database string) (*Database, error) {
+// ColCollection returns the collection in the col database.
+func (mdb *MDB) ColCollection(collectionName string) *mongo.Collection {
+	return mdb.coldb.Collection(collectionName)
+}
+
+// NewMDB creates a new instance of MDB
+func NewMDB(uri string, rowDBName string, colDBName string) (*MDB, error) {
 	clientOptions := options.Client().ApplyURI(uri)
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
@@ -27,40 +33,59 @@ func NewDatabase(uri string, database string) (*Database, error) {
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-  defer cancel()
+	defer cancel()
 	err = client.Ping(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	db := client.Database(database)
+	rowDB := client.Database(rowDBName)
+	colDB := client.Database(colDBName)
 
-	return &Database{
-		client:     client,
-		database:   db,
+	return &MDB{
+		client: client,
+		rowdb:  rowDB,
+		coldb:  colDB,
 	}, nil
 }
 
 // Disconnect disconnects from MongoDB
-func (db *Database) Disconnect(ctx context.Context) error {
-	return db.client.Disconnect(ctx)
+func (mdb *MDB) Disconnect(ctx context.Context) error {
+	return mdb.client.Disconnect(ctx)
 }
 
-// Drop drops the database
-func (db *Database) Drop(ctx context.Context) error {
-	return db.database.Drop(ctx)
+// Drop drops the databases
+func (mdb *MDB) Drop(ctx context.Context) error {
+	err := mdb.rowdb.Drop(ctx)
+	if err != nil {
+		return err
+	}
+
+	err = mdb.coldb.Drop(ctx)
+	if err != nil {
+		return err
+	}
+
+  return nil
 }
 
 // Ping pings MongoDB
-func (db *Database) Ping() error {
+func (mdb *MDB) Ping() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-  defer cancel()
-	return db.client.Ping(ctx, nil)
+	defer cancel()
+	return mdb.client.Ping(ctx, nil)
 }
 
-// InsertOne inserts a single record into MongoDB
-func (db *Database) InsertOne(ctx context.Context, collectionName string, document interface{}) error {
-	collection := db.Collection(collectionName)
+// InsertOneRow inserts a single record into the row database
+func (mdb *MDB) InsertOneRow(ctx context.Context, collectionName string, document interface{}) error {
+	collection := mdb.RowCollection(collectionName)
+	_, err := collection.InsertOne(ctx, document)
+	return err
+}
+
+// InsertOneCol inserts a single record into the col database
+func (mdb *MDB) InsertOneCol(ctx context.Context, collectionName string, document interface{}) error {
+	collection := mdb.ColCollection(collectionName)
 	_, err := collection.InsertOne(ctx, document)
 	return err
 }

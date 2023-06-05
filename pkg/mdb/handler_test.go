@@ -6,24 +6,30 @@ import (
   "fmt"
 )
 
-func TestGetAllStocksWithSelectedHeaders(t *testing.T) {
+func TestGetHeaders(t *testing.T) {
+	// Headers to request
 	headers := []string{"基本分析分數", "技術分析分數", "保留盈餘增長标准分数", "基因分析標準分數"}
-	data, err := db.GetAllStocksWithSelectedHeaders(headers, "test")
+
+	// Call the GetHeaders function
+	result, err := db.GetHeaders(headers, "test")
 	if err != nil {
-		t.Fatalf("failed to get data: %v", err)
+		t.Fatalf("failed to get headers: %v", err)
 	}
 
-	if len(data) == 0 {
-		t.Error("No data returned from handler")
+	// Check if the result is empty
+	if len(result) == 0 {
+		t.Error("No headers returned from handler")
 	} else {
-		prettyData, _ := json.MarshalIndent(data, "", "  ")
-		fmt.Println(string(prettyData))
+		// Print out the result in a pretty format
+		prettyResult, _ := json.MarshalIndent(result, "", "  ")
+		fmt.Println(string(prettyResult))
 	}
 }
 
 func TestGetAllHeadersForStock(t *testing.T) {
-	stockID := "1112HK-H&H國際控股"
-	data, err := db.GetAllHeadersForStock(stockID, "test")
+	stockName := "1112 HK-H&H國際控股"
+	data, err := db.GetAllHeadersForStock(stockName, "test")
+
 	if err != nil {
 		t.Fatalf("failed to get data: %v", err)
 	}
