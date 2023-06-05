@@ -21,13 +21,39 @@ func RowParse(file string, sheet string) ([]map[string]interface{}, []string, er
 		return nil, nil, err
 	}
 
-	headers := rows[0]
+  var headers []string
+  consecutiveEmptyRows := 0
+  start := 0
+  for _, row := range rows {
+    if len(row) < 4 {
+      consecutiveEmptyRows++
+      if consecutiveEmptyRows >= 4 {
+        break
+      }
+      continue
+    } else {
+      headers = row
+      start = consecutiveEmptyRows + 1
+      consecutiveEmptyRows = 0
+      break
+    }
+  }
 
 	if len(headers) == 0 {
 		return nil, nil, fmt.Errorf("no headers found")
 	}
 
-	for _, row := range rows[1:] {
+	for _, row := range rows[start:] {
+    if len(row) < 4 {
+      consecutiveEmptyRows++
+      if consecutiveEmptyRows >= 4 {
+        break
+      }
+      continue
+    }
+
+    consecutiveEmptyRows = 0 // Reset the count
+
 		// We'll try to parse each row, but if we encounter an error, we'll skip it
 		func() {
 			defer func() {
@@ -89,7 +115,25 @@ func ColParse(file string, sheet string) (map[string][]interface{}, []string, er
 		return nil, nil, err
 	}
 
-	headers := rows[0]
+  var headers []string
+  consecutiveEmptyRows := 0
+  start := 0
+
+  for _, row := range rows {
+    if len(row) < 4 {
+      consecutiveEmptyRows++
+      if consecutiveEmptyRows >= 4 {
+        break
+      }
+      continue
+    } else {
+      start = consecutiveEmptyRows + 1
+      headers = row
+      consecutiveEmptyRows = 0
+      break
+    }
+  }
+
 	if len(headers) == 0 {
 		return nil, nil, fmt.Errorf("no headers found")
 	}
@@ -99,7 +143,17 @@ func ColParse(file string, sheet string) (map[string][]interface{}, []string, er
 		colData[header] = make([]interface{}, 0)
 	}
 
-	for _, row := range rows[1:] {
+	for _, row := range rows[start:] {
+    if len(row) < 4 {
+      consecutiveEmptyRows++
+      if consecutiveEmptyRows >= 4 {
+        break
+      }
+      continue
+    }
+
+    consecutiveEmptyRows = 0 // Reset the count
+
 		// We'll try to parse each row, but if we encounter an error, we'll skip it
 		func() {
 			defer func() {

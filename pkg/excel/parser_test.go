@@ -30,11 +30,6 @@ func TestRowParse(t *testing.T) {
     if record, ok := item["股票"]; ok {
       t.Logf("股票 of %dth record: %v", i, record)
     }
-    if record, ok := item["stockid"]; ok {
-      t.Logf("stockid of %dth record: %v", i, record)
-    } else {
-      t.Logf("股票 field not found in the %dth record", i)
-    }
 	}
 }
 
