@@ -27,6 +27,7 @@ func (api *API) GetByHeadersHandler(w http.ResponseWriter, r *http.Request) (int
 
 	return data, nil
 }
+
 func (api *API) GetSingleRecordHandler(w http.ResponseWriter, r *http.Request) (interface{}, error) {
 	vars := mux.Vars(r)
 	collectionName := vars["collectionName"]

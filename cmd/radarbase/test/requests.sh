@@ -8,7 +8,7 @@ sleep 5  # Adjust this if your server takes longer to start
 
 # Test GetByHeadersHandler
 echo "Testing GetByHeadersHandler..."
-headers="基本分析分數,技術分析分數,保留盈餘增長标准分数,基因分析標準分數"
+headers="基本分析分數,技術分析分數,保留盈餘增長标准分数,基因分析標準分數,name"
 encodedHeaders=$(echo -n $headers | jq -sRr @uri)
 response=$(curl -s "http://localhost:8080/api/v1/StkHK/item?headers=${encodedHeaders}")
 echo "Response: ${response}"

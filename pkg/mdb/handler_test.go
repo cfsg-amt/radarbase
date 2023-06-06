@@ -8,7 +8,7 @@ import (
 
 func TestGetHeaders(t *testing.T) {
 	// Headers to request
-	headers := []string{"基本分析分數", "技術分析分數", "保留盈餘增長标准分数", "基因分析標準分數"}
+	headers := []string{"基本分析分數", "技術分析分數", "保留盈餘增長标准分数", "基因分析標準分數", "name"}
 
 	// Call the GetHeaders function
 	result, err := db.GetByHeaders(headers, "test")

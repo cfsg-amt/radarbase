@@ -11,10 +11,10 @@ import (
 )
 
 func TestGetByHeadersHandler(t *testing.T) {
-	headers := []string{"基本分析分數", "技術分析分數", "保留盈餘增長标准分数", "基因分析標準分數"}
+	headers := []string{"基本分析分數", "技術分析分數", "保留盈餘增長标准分数", "基因分析標準分數", "name"}
 	encodedHeaders := url.QueryEscape(strings.Join(headers, ","))
 
-	resp, err := http.Get(fmt.Sprintf("http://localhost:8080/api/v1/test/item?headers=%s", encodedHeaders))
+	resp, err := http.Get(fmt.Sprintf("http://localhost:8081/api/v1/test/item?headers=%s", encodedHeaders))
 
 	if err != nil {
 		t.Fatalf("could not send GET request: %v", err)
@@ -48,7 +48,7 @@ func TestGetSingleRecordHandler(t *testing.T) {
 	stockName := "1112HK-H&H國際控股"
 	encodedStockName := url.QueryEscape(stockName)
 
-	resp, err := http.Get(fmt.Sprintf("http://localhost:8080/api/v1/test/item/%s", encodedStockName))
+	resp, err := http.Get(fmt.Sprintf("http://localhost:8081/api/v1/test/item/%s", encodedStockName))
 
 	if err != nil {
 		t.Fatalf("could not send GET request: %v", err)
@@ -79,7 +79,7 @@ func TestGetSingleRecordHandler(t *testing.T) {
 
 
 func TestGetHeadersHandler(t *testing.T) {
-	resp, err := http.Get("http://localhost:8080/api/v1/headers/test")
+	resp, err := http.Get("http://localhost:8081/api/v1/headers/test")
 	if err != nil {
 		t.Fatalf("could not send GET request: %v", err)
 	}

@@ -66,11 +66,11 @@ func RowParse(file string, sheet string) ([]map[string]interface{}, []string, er
 				return
 			}
 
-      row[0] = strings.ReplaceAll(row[0], " ", "")
+      name := strings.ReplaceAll(row[0], " ", "")
 
 			// Generate SHA256 hash of the first cell of the row
 			hash := sha256.New()
-			hash.Write([]byte(row[0]))
+			hash.Write([]byte(name))
 			hashStr := hex.EncodeToString(hash.Sum(nil))
 
 			record := map[string]interface{}{
@@ -97,9 +97,14 @@ func RowParse(file string, sheet string) ([]map[string]interface{}, []string, er
 
       record["valid"] = valid
 
+      record["name"] = name
+
 			data = append(data, record)
 		}()
 	}
+
+  headers = append([]string{"name"}, headers...)
+  headers = append([]string{"valid"}, headers...)
 
 	return data, headers, nil
 }
@@ -166,11 +171,11 @@ func ColParse(file string, sheet string) (map[string][]interface{}, []string, er
 				return
 			}
 
-      row[0] = strings.ReplaceAll(row[0], " ", "")
+      name := strings.ReplaceAll(row[0], " ", "")
 
 			// Generate SHA256 hash of the first cell of the row
 			hash := sha256.New()
-			hash.Write([]byte(row[0]))
+			hash.Write([]byte(name))
 			hashStr := hex.EncodeToString(hash.Sum(nil))
 
 			valid := 1
@@ -193,12 +198,17 @@ func ColParse(file string, sheet string) (map[string][]interface{}, []string, er
 
 			// Append the validity flag to the "valid" column
 			colData["valid"] = append(colData["valid"], valid)
+
+      colData["name"] = append(colData["name"], name)
 			
 			// Use the value of the first column, remove spaces and add to the "_id" column.
 			colData["_id"] = append(colData["_id"], hashStr)
 			
 		}()
 	}
+
+  headers = append([]string{"name"}, headers...)
+  headers = append([]string{"valid"}, headers...)
 
 	return colData, headers, nil
 }
