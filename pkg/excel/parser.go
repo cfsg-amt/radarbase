@@ -88,9 +88,11 @@ func RowParse(file string, sheet string) ([]map[string]interface{}, []string, er
 				if i < len(headers) {
 					value, err := strconv.ParseFloat(cell, 64)
 					if err != nil {
-						record[headers[i]] = cell
-					} else {
-						record[headers[i]] = value
+            record[headers[i]] = cell
+          } else {
+            // Format float with 2 decimal places
+            formattedValue, _ := strconv.ParseFloat(fmt.Sprintf("%.5f", value), 64)
+            record[headers[i]] = formattedValue
 					}
 				}
 			}
@@ -189,9 +191,11 @@ func ColParse(file string, sheet string) (map[string][]interface{}, []string, er
 				if i < len(headers) {
 					value, err := strconv.ParseFloat(cell, 64)
 					if err != nil {
-						colData[headers[i]] = append(colData[headers[i]], cell)
+            colData[headers[i]] = append(colData[headers[i]], cell)
 					} else {
-						colData[headers[i]] = append(colData[headers[i]], value)
+            // Format float with 2 decimal places
+            formattedValue, _ := strconv.ParseFloat(fmt.Sprintf("%.3f", value), 64)
+						colData[headers[i]] = append(colData[headers[i]], formattedValue)
 					}
 				}
 			}
