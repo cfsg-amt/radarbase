@@ -50,7 +50,7 @@ func main() {
 	}
 
 	// List all the sheet names that you need to load
-	sheets := []string{"CSV-Sec", "CSV-Ind", "CSV-StkSH", "CSV-StkSZ", "CSV-StkHK"}
+	sheets := []string{"Sec", "Ind", "StkSH", "StkSZ", "StkHK"}
 	filePath := "files/radar.xlsm"
 
 	for _, sheet := range sheets {
