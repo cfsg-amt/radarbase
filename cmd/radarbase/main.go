@@ -67,7 +67,7 @@ func main() {
 	// Start server
 	srv := &http.Server{
 		Handler: apiHandler.SetupRouter(), // use the SetupRouter method here
-		Addr:    "127.0.0.1:8080",
+		Addr:    "127.0.0.1:8996",
 	}
 
 	go func() {
