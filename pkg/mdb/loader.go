@@ -40,7 +40,44 @@ func (db *MDB) RowLoadToDB(data []map[string]interface{}, collectionName string)
 }
 
 func (db *MDB) ColLoadToDB(data map[string][]interface{}, headers []string, collectionName string) error {
-	// Create map to hold grouped data
+	// Create map to hold min and max data
+	minData := make(map[string]float64)
+	maxData := make(map[string]float64)
+
+	// Initialize the min and max data with the first element of each header
+	for _, header := range headers {
+		if len(data[header]) > 0 {
+			firstValue, ok := data[header][0].(float64)
+			if ok {
+				minData[header] = firstValue
+				maxData[header] = firstValue
+			} else {
+        minData[header] = 0
+        maxData[header] = 0
+      }
+		}
+	}
+
+	// Iterate through the data to find the min and max for each header
+	for _, header := range headers {
+		for _, value := range data[header] {
+			floatValue, ok := value.(float64)
+			if ok {
+				if floatValue < minData[header] {
+					minData[header] = floatValue
+				}
+				if floatValue > maxData[header] {
+					maxData[header] = floatValue
+				}
+			} else {
+        minData[header] = 0
+        maxData[header] = 0
+        continue;
+      }
+		}
+	}
+
+  // Create map to hold grouped data
 	groupedData := make(map[int]map[string]interface{})
 	for i := 0; i < 10; i++ {
 		groupedData[i] = make(map[string]interface{})
@@ -63,7 +100,6 @@ func (db *MDB) ColLoadToDB(data map[string][]interface{}, headers []string, coll
   }
 
 	// Get collection for headers
-	// headers is in coldb
 	headersCollection := db.ColCollection("headers")
 
 	// Update headers into MongoDB headers collection with collection name as identifier
@@ -76,6 +112,14 @@ func (db *MDB) ColLoadToDB(data map[string][]interface{}, headers []string, coll
 	// Get collection for data and insert data into MongoDB
 	dataCollection := db.ColCollection(collectionName)
 
+	// Insert min and max data into the database
+	minMaxDoc := bson.M{"_id": collectionName + "_min_max", "min": minData, "max": maxData}
+	_, err = dataCollection.UpdateOne(context.Background(), bson.M{"_id": minMaxDoc["_id"]}, bson.M{"$set": minMaxDoc}, options.Update().SetUpsert(true))
+	if err != nil {
+		return fmt.Errorf("could not update min/max data into MongoDB: %w", err)
+	}
+
+	// Insert other data into the database
 	for score, groupedValues := range groupedData {
 		groupedValues["_id"] = collectionName + strconv.Itoa(score)
 

@@ -13,6 +13,7 @@ func (api *API) SetupRouter() *mux.Router {
 	router.HandleFunc("/api/v1/{collectionName}/item", api.handleRequest(api.GetByHeadersHandler)).Methods("GET")
 	router.HandleFunc("/api/v1/{collectionName}/item/{stockName}", api.handleRequest(api.GetSingleRecordHandler)).Methods("GET")
 	router.HandleFunc("/api/v1/headers/{collectionName}", api.handleRequest(api.GetHeadersHandler)).Methods("GET")
+  router.HandleFunc("/api/v1/minmax/{collectionName}", api.handleRequest(api.GetMinMaxDataHandler)).Methods("GET")
 
 	return router
 }

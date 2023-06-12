@@ -53,3 +53,18 @@ func (api *API) GetHeadersHandler(w http.ResponseWriter, r *http.Request) (inter
 
 	return data, nil
 }
+
+func (api *API) GetMinMaxDataHandler(w http.ResponseWriter, r *http.Request) (interface{}, error) {
+	collectionName := mux.Vars(r)["collectionName"]
+
+	minData, maxData, err := api.db.GetMinMaxData(collectionName)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]map[string]float64{
+		"min": minData,
+		"max": maxData,
+	}, nil
+}
+

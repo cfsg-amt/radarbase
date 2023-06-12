@@ -1,2 +1,0 @@
-Data updated into MongoDB!
-Columnar data updated into MongoDB!

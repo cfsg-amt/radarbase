@@ -28,4 +28,10 @@ response=$(curl -s "http://localhost:8996/api/v1/headers/StkHK")
 echo "Response: ${response}"
 echo
 
+# Test GetMinMaxDataHandler
+echo "Testing GetMinMaxDataHandler..."
+response=$(curl -s "http://localhost:8996/api/v1/minmax/StkHK")
+echo "Response: ${response}"
+echo
+
 echo "Finished tests."

@@ -4,12 +4,74 @@ import (
 	"context"
 	"fmt"
   "time"
+  "strconv"
   "encoding/hex"
   "crypto/sha256"
   
 	"go.mongodb.org/mongo-driver/bson"
   "go.mongodb.org/mongo-driver/bson/primitive"
 )
+
+func (db *MDB) GetMinMaxData(collectionName string) (minData map[string]float64, maxData map[string]float64, err error) {
+	// Get collection for data
+	dataCollection := db.ColCollection(collectionName)
+
+	// Get min and max data from the database
+	minMaxDoc := bson.M{}
+	err = dataCollection.FindOne(context.Background(), bson.M{"_id": collectionName + "_min_max"}).Decode(&minMaxDoc)
+	if err != nil {
+		return nil, nil, fmt.Errorf("could not retrieve min/max data from MongoDB: %w", err)
+	}
+
+  // Convert interface{} to map[string]interface{}
+  minDataPrimitiveM, ok := minMaxDoc["min"].(primitive.M)
+  if !ok {
+    return nil, nil, fmt.Errorf("unable to convert min data to primitive.M")
+  }
+
+  minDataInterface := make(map[string]interface{})
+  bsonBytes, _ := bson.Marshal(minDataPrimitiveM)
+  err = bson.Unmarshal(bsonBytes, &minDataInterface)
+  if err != nil {
+    return nil, nil, fmt.Errorf("unable to unmarshal min data BSON: %w", err)
+  }
+
+  minData = make(map[string]float64)
+  for key, value := range minDataInterface {
+    switch v := value.(type) {
+    case float64:
+      minData[key] = v
+    case primitive.Decimal128:
+      f, _ := strconv.ParseFloat(v.String(), 64)
+      minData[key] = f
+  }
+  }
+
+  maxDataPrimitiveM, ok := minMaxDoc["max"].(primitive.M)
+  if !ok {
+    return nil, nil, fmt.Errorf("unable to convert max data to primitive.M")
+  }
+
+  maxDataInterface := make(map[string]interface{})
+  bsonBytes, _ = bson.Marshal(maxDataPrimitiveM)
+  err = bson.Unmarshal(bsonBytes, &maxDataInterface)
+  if err != nil {
+    return nil, nil, fmt.Errorf("unable to unmarshal max data BSON: %w", err)
+  }
+
+  maxData = make(map[string]float64)
+  for key, value := range maxDataInterface {
+    switch v := value.(type) {
+    case float64:
+      maxData[key] = v
+    case primitive.Decimal128:
+      f, _ := strconv.ParseFloat(v.String(), 64)
+      maxData[key] = f
+  }
+  }
+
+  return minData, maxData, nil
+}
 
 func (db *MDB) GetSingleRecord(name string, collectionName string) (bson.M, error) {
   // Generate SHA256 hash of the stockName

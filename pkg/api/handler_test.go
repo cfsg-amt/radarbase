@@ -106,3 +106,33 @@ func TestGetHeadersHandler(t *testing.T) {
 	// Print the unmarshaled response
 	t.Logf("Headers: %+v\n", data)
 }
+
+func TestGetMinMaxDataHandler(t *testing.T) {
+	resp, err := http.Get("http://localhost:8081/api/v1/minmax/test")
+
+	if err != nil {
+		t.Fatalf("could not send GET request: %v", err)
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("unexpected status: got %v want %v", resp.Status, http.StatusOK)
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatalf("could not read response: %v", err)
+	}
+
+	// Print the raw JSON response
+	t.Logf("JSON Response: %s\n", body)
+
+	var data map[string]map[string]float64
+	if err := json.Unmarshal(body, &data); err != nil {
+		t.Fatalf("could not unmarshal response: %v", err)
+	}
+
+	// Print the unmarshaled response
+	t.Logf("Map Response: %+v\n", data)
+}
