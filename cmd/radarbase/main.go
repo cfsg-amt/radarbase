@@ -14,6 +14,16 @@ import (
 	"radarbase/pkg/mdb"
 )
 
+func loadDataIntoDB(db *mdb.MDB, filePath string, sheets []string) {
+	for _, sheet := range sheets {
+		err := loadSheetIntoDB(db, filePath, sheet)
+		if err != nil {
+			fmt.Printf("Failed to load sheet %s: %v\n", sheet, err)
+			os.Exit(1)
+		}
+	}
+}
+
 // Helper function to load a single sheet into the database
 func loadSheetIntoDB(db *mdb.MDB, filePath string, sheetName string) error {
 	// Parse row data
@@ -52,14 +62,9 @@ func main() {
 	// List all the sheet names that you need to load
 	sheets := []string{"Sec", "Ind", "StkSH", "StkSZ", "StkHK"}
 	filePath := "files/radar.xlsm"
-
-	for _, sheet := range sheets {
-		err = loadSheetIntoDB(db, filePath, sheet)
-		if err != nil {
-			fmt.Printf("Failed to load sheet %s: %v\n", sheet, err)
-			os.Exit(1)
-		}
-	}
+  
+  // Load initial data into the database
+  loadDataIntoDB(db, filePath, sheets)
 
 	// Initialize API
 	apiHandler := api.NewAPI(db)
@@ -74,6 +79,15 @@ func main() {
 		if err := srv.ListenAndServe(); err != http.ErrServerClosed {
 			// It's fine to panic here, as this should never happen when closing the server
 			log.Panic(err)
+		}
+	}()
+
+	// Setup a ticker to reload the data every 6 hours
+	ticker := time.NewTicker(6 * time.Hour)
+	go func() {
+		for {
+			<-ticker.C // wait for the ticker to fire
+			loadDataIntoDB(db, filePath, sheets)
 		}
 	}()
 
