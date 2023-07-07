@@ -10,6 +10,9 @@ import (
 func (api *API) SetupRouter() *mux.Router {
 	router := mux.NewRouter()
 
+  router.HandleFunc("/api/v1/kv/login/{key}", api.handleRequest(api.GetKeyValueHandler)).Methods("GET")
+  router.HandleFunc("/api/v1/changepwd", api.handleRequest(api.SetKeyValueHandler)).Methods("POST")
+
 	router.HandleFunc("/api/v1/{collectionName}/item", api.handleRequest(api.GetByHeadersHandler)).Methods("GET")
 	router.HandleFunc("/api/v1/{collectionName}/item/{stockName}", api.handleRequest(api.GetSingleRecordHandler)).Methods("GET")
 	router.HandleFunc("/api/v1/headers/{collectionName}", api.handleRequest(api.GetHeadersHandler)).Methods("GET")

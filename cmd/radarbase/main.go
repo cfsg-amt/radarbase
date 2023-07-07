@@ -69,6 +69,9 @@ func main() {
 	// Initialize API
 	apiHandler := api.NewAPI(db)
 
+  // Initialize hashedpwd
+  apiHandler.SetValue([]byte("hashedpwd"), []byte("$2y$10$jcmBuU1B51qmV7eAb9uMCeyrIY41XVDW7TbGCfYDZGzyT00FQN5PS"));
+
 	// Start server
 	srv := &http.Server{
 		Handler: apiHandler.SetupRouter(), // use the SetupRouter method here
