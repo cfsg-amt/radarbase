@@ -70,7 +70,7 @@ func main() {
 	apiHandler := api.NewAPI(db)
 
   // Initialize hashedpwd
-  apiHandler.SetValue([]byte("hashedpwd"), []byte("$2y$10$jcmBuU1B51qmV7eAb9uMCeyrIY41XVDW7TbGCfYDZGzyT00FQN5PS"));
+  apiHandler.SetValue([]byte("hashedpwd"), []byte("$2y$10$W5DWptyelFdCgI3x.5WjSuJzrZYBE.1HY6GRTQ2BMQhTZQ/TAwt0q"));
 
 	// Start server
 	srv := &http.Server{
