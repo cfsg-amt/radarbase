@@ -3,6 +3,7 @@ package mdb
 import (
 	"context"
   "strconv"
+  "strings"
   "fmt"
 
   "go.mongodb.org/mongo-driver/bson"
@@ -104,7 +105,8 @@ func (db *MDB) ColLoadToDB(data map[string][]interface{}, headers []string, coll
     case float64:
       scoreValue = v
     case string:
-      scoreValue, err = strconv.ParseFloat(v, 64)
+      trimmedV := strings.TrimSpace(v) // Trim spaces
+      scoreValue, err = strconv.ParseFloat(trimmedV, 64)
       if err != nil {
         fmt.Printf("Value at index %d could not be parsed to float64: %v\n", i, err)
         continue
