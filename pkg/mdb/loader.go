@@ -19,22 +19,31 @@ func (db *MDB) RowLoadToDB(data []map[string]interface{}, collectionName string)
 	// Get collection for data
 	dataCollection := db.RowCollection(collectionName)
 
-	// Update data into MongoDB
-	for _, item := range insertData {
-		update := bson.M{
-			"$set": item, // If the fields in item do not exist in the document, $set will add the fields.
-		}
+  // Update data into MongoDB
+  for _, item := range insertData {
+    itemMap, ok := item.(map[string]interface{})
+    if !ok {
+      return fmt.Errorf("item is not a map[string]interface{}, it's a %T", item)
+    }
+    idValue, ok := itemMap["_id"]
+    if !ok {
+      return fmt.Errorf("missing _id key in item map")
+    }
 
-    filter := bson.M{"_id": item.(map[string]interface{})["_id"]} // update the document with the same _id
+    update := bson.M{
+      "$set": item, // If the fields in item do not exist in the document, $set will add the fields.
+    }
 
-		_, err := dataCollection.UpdateOne(context.Background(), filter, update, options.Update().SetUpsert(true))
+    filter := bson.M{"_id": idValue} // update the document with the same _id
 
-		if err != nil {
-			return fmt.Errorf("could not update data into MongoDB: %w", err)
-		}
-	}
+    _, err := dataCollection.UpdateOne(context.Background(), filter, update, options.Update().SetUpsert(true))
 
-	fmt.Println("Data updated into MongoDB!")
+    if err != nil {
+      return fmt.Errorf("could not update data into MongoDB: %w", err)
+    }
+  }
+
+  fmt.Println("Row data updated into MongoDB! (", collectionName, ")")
 
 	return nil
 }
@@ -88,7 +97,13 @@ func (db *MDB) ColLoadToDB(data map[string][]interface{}, headers []string, coll
 
   // Group data based on "時富雷達 (CR)" score
   for i, value := range data["時富雷達 (CR)"] {
-    score := int(value.(float64))
+    scoreValue, ok := value.(float64)
+    if !ok {
+        fmt.Printf("Value at index %d could not be converted to float64, skipping\n", i)
+        continue
+    }
+
+    score := int(scoreValue);
     // Ensure score is within 1-10
     if score >= 0 && score < 10 {
       for _, header := range headers {
@@ -129,7 +144,7 @@ func (db *MDB) ColLoadToDB(data map[string][]interface{}, headers []string, coll
 		}
 	}
 
-	fmt.Println("Columnar data updated into MongoDB!")
+  fmt.Println("Column data updated into MongoDB! (", collectionName, ")")
 
 	return nil
 }
