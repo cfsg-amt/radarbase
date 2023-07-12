@@ -99,7 +99,7 @@ func (db *MDB) ColLoadToDB(data map[string][]interface{}, headers []string, coll
   for i, value := range data["時富雷達 (CR)"] {
     scoreValue, ok := value.(float64)
     if !ok {
-        fmt.Printf("Value at index %d could not be converted to float64, skipping\n", i)
+        fmt.Printf("Value at index %d could not be converted to float64, skipping\n %d", i, value)
         continue
     }
 
