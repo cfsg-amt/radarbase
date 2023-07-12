@@ -97,12 +97,20 @@ func (db *MDB) ColLoadToDB(data map[string][]interface{}, headers []string, coll
 
   // Group data based on "時富雷達 (CR)" score
   for i, value := range data["時富雷達 (CR)"] {
-    scoreValue, ok := value.(float64)
+    var scoreValue float64
+    var err error
 
-    if !ok {
-      fmt.Printf("Value at index %d is not a float64\n", i)
-      fmt.Printf("Type: %T\n", value)
-      fmt.Printf("Value: %v\n", value)
+    switch v := value.(type) {
+    case float64:
+      scoreValue = v
+    case string:
+      scoreValue, err = strconv.ParseFloat(v, 64)
+      if err != nil {
+        fmt.Printf("Value at index %d could not be parsed to float64: %v\n", i, err)
+        continue
+      }
+    default:
+      fmt.Printf("Value at index %d is not a float64 nor string, it's a %T\n", i, value)
       fmt.Println()
       continue
     }
