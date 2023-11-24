@@ -61,7 +61,8 @@ func main() {
 
 	// List all the sheet names that you need to load
 	sheets := []string{"Sec", "Ind", "StkSH", "StkSZ", "StkHK"}
-  filePath := `C:\\Users\\phili\\Desktop\\Radar\\Radar - 2)3)4) GC Stock level (Daily) XLS format.xlsm`
+  // filePath := `C:\\Users\\phili\\Desktop\\Radar\\Radar - 2)3)4) GC Stock level (Daily) XLS format.xlsm`
+  filePath := `/Users/angold/Work/cash/radarbase/files/radar.xlsm`
 
   // Load initial data into the database
   loadDataIntoDB(db, filePath, sheets)

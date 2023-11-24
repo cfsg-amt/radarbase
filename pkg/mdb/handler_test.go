@@ -7,6 +7,7 @@ import (
 )
 
 func TestGetMinMaxData(t *testing.T) {
+  print("TestGetMinMaxData\n")
 	minData, maxData, err := db.GetMinMaxData("test")
 	if err != nil {
 		t.Fatalf("failed to get min/max data: %v", err)
@@ -24,8 +25,9 @@ func TestGetMinMaxData(t *testing.T) {
 }
 
 func TestGetHeaders(t *testing.T) {
+  print("TestGetHeaders\n")
 	// Headers to request
-	headers := []string{"基本分析分數", "技術分析分數", "保留盈餘增長标准分数", "基因分析標準分數", "name"}
+	headers := []string{"基本分析分數", "技術分析分數", "基因分析標準分數", "name"}
 
 	// Call the GetHeaders function
 	result, err := db.GetByHeaders(headers, "test")
@@ -44,7 +46,9 @@ func TestGetHeaders(t *testing.T) {
 }
 
 func TestGetAllHeadersForStock(t *testing.T) {
-  stockName := "1070HK-ＴＣＬ電子"
+  print("TestGetAllHeadersForStock\n")
+  // stockName := "1070HK-ＴＣＬ電子"
+  stockName := "消費奢侈品"
 
 	data, err := db.GetSingleRecord(stockName, "test")
 

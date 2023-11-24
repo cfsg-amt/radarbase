@@ -96,8 +96,8 @@ func (db *MDB) ColLoadToDB(data map[string][]interface{}, headers []string, coll
 		}
 	}
 
-  // Group data based on "時富雷達 (CR)" score
-  for i, value := range data["時富雷達 (CR)"] {
+  // Group data based on "歸因分析總分" score
+  for i, value := range data["歸因分析總分"] {
     var scoreValue float64
     var err error
 

@@ -22,7 +22,7 @@ func TestMain(m *testing.M) {
 	}
 
 	// Parse row data
-	rowData, rowHeaders, err := excel.RowParse("testdata/sample.xlsx", "Sheet1")
+	rowData, rowHeaders, err := excel.RowParse("testdata/sample1.xlsx", "Sheet1")
   fmt.Println(rowHeaders) // TODO: remove this
 
 	if err != nil {
@@ -31,7 +31,7 @@ func TestMain(m *testing.M) {
 	}
 
 	// Parse columnar data
-	colData, colHeaders, err := excel.ColParse("testdata/sample.xlsx", "Sheet1")
+	colData, colHeaders, err := excel.ColParse("testdata/sample1.xlsx", "Sheet1")
   fmt.Println(colHeaders)
 
 	if err != nil {

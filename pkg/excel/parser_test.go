@@ -34,7 +34,7 @@ func TestRowParse(t *testing.T) {
 }
 
 func TestColParse(t *testing.T) {
-	data, headers, err := excel.ColParse("testdata/sample.xlsx", "Sheet1")
+	data, headers, err := excel.ColParse("testdata/sample1.xlsx", "Sheet1")
 	if err != nil {
 		t.Errorf("ColParse failed with error: %v", err)
 	}
@@ -53,5 +53,6 @@ func TestColParse(t *testing.T) {
 	// This is not generally part of testing but can help verify that the parsing is done correctly
 	for header, values := range data {
     t.Logf("Parsed data for header %s: %+v", header, values)
+    fmt.Printf("Parsed data for header %s: %+v\n", header, values)
   }
 }
