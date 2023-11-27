@@ -32,6 +32,40 @@ Or open another terminal window, try to ping that device:
 ping <LAN-ADDR>
 ```
 
+### Inbound Rules
+Check and Allow a Port through Windows Firewall:
+
+Open Windows Firewall Settings:
+
+Press the Windows key, type "firewall," and select "Windows Defender Firewall" or just "Firewall & network protection" in Windows Security.
+Advanced Settings:
+
+In the Windows Defender Firewall window, click on "Advanced settings" on the left-hand side. This opens the Windows Defender Firewall with Advanced Security window. (You might need administrator privileges to access this.)
+Inbound Rules:
+
+In the Advanced Security window, click on "Inbound Rules" in the left pane.
+Check Existing Rules:
+
+Look through the list of Inbound Rules for any rules related to port 8996.
+The rules will be listed by name, and you can see the details, including the specific port number, in the "Ports" column.
+Creating a New Rule (if necessary):
+
+If there’s no existing rule for port 8996, you'll need to create one. To do this, click "New Rule..." on the right-hand side.
+Select "Port" as the Rule Type and click "Next."
+Choose "TCP" or "UDP" based on your application's requirement (TCP is more common for web services). Then, select "Specific local ports," enter "8996," and click "Next."
+Choose "Allow the connection" and click "Next."
+Ensure all three profiles (Domain, Private, Public) are checked as per your requirement and click "Next."
+Give the rule a name (like "Radarbase Port 8996") and an optional description, then click "Finish."
+Review and Apply:
+
+After creating the new rule, it should appear in the list of Inbound Rules. Make sure it is enabled (checked).
+Restart the Radarbase Service:
+
+After adjusting the firewall settings, it may be a good idea to restart the Radarbase service to ensure the new settings take effect.
+Test Connectivity Again:
+
+Try accessing the Radarbase server from another device on your network to see if the firewall changes resolved the issue.
+
 If there are some response from your server, then probably you need to:
 1. Check your router's firewall settings to ensure that incoming connections on port `2222` are allowed.
 2. Ensure that any firewall on your Windows PC allows connections on port `8996`.
