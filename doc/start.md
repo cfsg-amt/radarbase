@@ -20,7 +20,7 @@ If not, please back to that terminal running radarbase, check its log.
 
 ## Testphase 2: LAN Server Status
 First, in the server, try to get its LAN address. In Windows 10, please following [this](https://support.microsoft.com/en-us/windows/find-your-ip-address-in-windows-f21a9bbc-c582-55cd-35e0-73431160a1b9#Category=Windows_10) instruction.
-Then using another device that *in the same network* (wireless or wired) with that server.
+Then using another device that **in the same network** (wireless or wired) with that server.
 
 Open the browser on that device, and try to access `<LAN-ADDR>:8996/api/v1/minmax/StkSH`, where the `<LAN-ADDR>` is the LAN address of the server.
 See if you can get the same response as before in Testphase 1.
@@ -37,7 +37,7 @@ If there are some response from your server, then probably you need to:
 2. Ensure that any firewall on your Windows PC allows connections on port `8996`.
 
 ## Testphase 3: DDNS and Port Forwarding
-If the first two phases has passed, the last step would be set up your *DDNS* and *Port Forwarding* on your router, in order to let other device outside your network can access the radarbase server.
+If the first two phases has passed, the last step would be set up your **DDNS** and **Port Forwarding** on your router, in order to let other device outside your network can access the radarbase server.
 
 ### DDNS
 In the setting page of your router, try to assign a global domain name that forwarding to your lan address of the server.
