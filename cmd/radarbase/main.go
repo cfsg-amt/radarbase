@@ -61,8 +61,8 @@ func main() {
 
 	// List all the sheet names that you need to load
 	sheets := []string{"Sec", "Ind", "StkSH", "StkSZ", "StkHK"}
-  // filePath := `C:\\Users\\phili\\Desktop\\Radar\\Radar\\radar001.xlsm`
-  filePath := `/Users/angold/Work/cash/radarbase/files/radar.xlsm`
+  filePath := `C:\\Users\\phili\\Desktop\\Radar\\Radar\\radar001.xlsm`
+  // filePath := `/Users/angold/Work/cash/radarbase/files/radar.xlsm`
 
   // Load initial data into the database
   loadDataIntoDB(db, filePath, sheets)
