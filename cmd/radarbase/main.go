@@ -61,8 +61,8 @@ func main() {
 
 	// List all the sheet names that you need to load
 	sheets := []string{"Sec", "Ind", "StkSH", "StkSZ", "StkHK"}
-  filePath := `C:\\Users\\phili\\Desktop\\Radar\\Radar\\radar001.xlsm`
-  // filePath := `/Users/angold/Work/cash/radarbase/files/radar.xlsm`
+  // filePath := `C:\\Users\\phili\\Desktop\\Radar\\Radar\\radar001.xlsm`
+  filePath := `/Users/angold/Work/cash/radarbase/files/radar.xlsm`
 
   // Load initial data into the database
   loadDataIntoDB(db, filePath, sheets)
@@ -76,7 +76,7 @@ func main() {
 	// Start server
 	srv := &http.Server{
 		Handler: apiHandler.SetupRouter(), // use the SetupRouter method here
-		Addr:    "127.0.0.1:8996",
+		Addr:    ":8996",
 	}
 
 	go func() {
