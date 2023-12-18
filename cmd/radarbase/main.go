@@ -79,12 +79,22 @@ func main() {
 		Addr:    ":8996",
 	}
 
+  /*
 	go func() {
 		if err := srv.ListenAndServe(); err != http.ErrServerClosed {
 			// It's fine to panic here, as this should never happen when closing the server
 			log.Panic(err)
 		}
 	}()
+  */
+
+  go func() {
+    err := srv.ListenAndServeTLS("C:\\Users\\phili\\Documents\\PEM\\l45411e1993.tplinkdns.com-crt.pem", "C:\\Users\\phili\\Documents\\PEM\\l45411e1993.tplinkdns.com-key.pem")
+      if err != http.ErrServerClosed {
+          // handle error
+          log.Fatalf("ListenAndServeTLS error: %v", err)
+      }
+  }()
 
 	// Setup a ticker to reload the data every 6 hours
 	ticker := time.NewTicker(6 * time.Hour)
