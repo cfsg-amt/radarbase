@@ -89,7 +89,7 @@ func main() {
   */
 
   go func() {
-    err := srv.ListenAndServeTLS("C:\\Users\\phili\\Documents\\PEM\\l45411e1993.tplinkdns.com-crt.pem", "C:\\Users\\phili\\Documents\\PEM\\l45411e1993.tplinkdns.com-key.pem")
+    err := srv.ListenAndServeTLS("C:\\Users\\phili\\Documents\\PEM\\l45411e1993.tplinkdns.com-chain.pem", "C:\\Users\\phili\\Documents\\PEM\\l45411e1993.tplinkdns.com-key.pem")
       if err != http.ErrServerClosed {
           // handle error
           log.Fatalf("ListenAndServeTLS error: %v", err)
